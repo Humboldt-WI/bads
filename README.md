@@ -12,3 +12,7 @@ Video lectures from past semesters are available on [youtube](https://www.youtub
 ## Prueba
 
 Probando primera vez
+
+## Local Development
+
+1. Open index.html in your browser.
