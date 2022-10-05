@@ -1,5 +1,5 @@
 # Business analytics and data science
-Welcome to the business analytics and data science -- BADS -- repository ...
+Welcome to the business analytics and data science – BADS – repository ...
 
 BADS is a master-level lecture offered by members of the [Chair of Information Systems of the Humboldt-University of Berlin](https://www.wiwi.hu-berlin.de/en/Professorships/bwl/wi/standardseite-en?set_language=en). 
 
