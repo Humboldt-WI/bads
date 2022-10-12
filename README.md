@@ -10,5 +10,4 @@ The repository provides demo codes and tutorials for post-processing lecture ses
 The repository also provides exercises for you to work on (see folder [excercises](https://github.com/Humboldt-WI/bads/tree/master/exercises)). We will discuss solutions to the exercises in BADS tutorial sessions. 
 
 From winter semester 22/23 onwards, video-recordings of BADS lecture and tutorial sessions will be shared via [quantinar](https://www.quantinar.com/). We upload new content every week on Fridays (i.e., after completing the program of that week). The outline of the module is as follows: <br>
-
-[](https://github.com/Humboldt-WI/bads/blob/master/bads_schedule.png)]
+![BADS Schedule]([/assets/images/san-juan-mountains.jpg](https://github.com/Humboldt-WI/bads/blob/master/bads_schedule.png) "BADS Schedule")
