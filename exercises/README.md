@@ -1,0 +1,2 @@
+# Demo notebooks 
+Welcome to the BADS excercise space. The Jupyter notebooks in this folder provide specific programming tasks to challange your programming and data science skills. We will discuss solutions to the exercise tasks in BADS tutorial sessions.
