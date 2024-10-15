@@ -7,6 +7,6 @@ Data is omnipresent. Often called "the new oil" to emphasize its value for econo
 
 The repository provides demo codes and tutorials for post-processing lecture sessions. The corresponding content is available in the folder [demo_notebooks](https://github.com/Humboldt-WI/bads/tree/master/demo_notebooks). We use the Python programming language and share content as Juypter notebooks. 
 
-The repository also provides exercises for you to work on (see folder [excercises](https://github.com/Humboldt-WI/bads/tree/master/exercises)). We will discuss solutions to the exercises in BADS tutorial sessions. 
+The repository also provides exercises for you to work on (see folder [excercises](https://github.com/Humboldt-WI/bads/tree/master/exercises)). You are supposed to solve these exercises on your own. We will offer a Q&A session to discuss any questions you came accross when working on the exercise tasks and provide help. However, solutions to exercise notebooks will typically not be shared. 
 
 
