@@ -7,4 +7,6 @@
 # ignore all py-cache files
 **/.pyc
 # ignore solutions to exercises\solutions
-/exercises/solutions/*
+/exercise_notebooks/solutions/
+
+/tutorial_notebooks/work-in-progress/
