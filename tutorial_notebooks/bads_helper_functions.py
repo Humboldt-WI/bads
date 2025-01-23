@@ -4,7 +4,9 @@
 # tasks like loading and preparing a given data set to streamline the tutorial notebooks
 ####################################################################################
 
-def get_HMEQ_credit_data(outlier_factor=-1, data_url='https://raw.githubusercontent.com/Humboldt-WI/bads/master/data/hmeq.csv'):
+def get_HMEQ_credit_data(data_url='https://raw.githubusercontent.com/Humboldt-WI/bads/master/data/hmeq.csv', 
+                         outlier_factor=0,
+                         scale_features=False):
     '''
         Fetches and prepares the Home Equity (HMEQ) credit data from a predefined source.
         
@@ -34,14 +36,17 @@ def get_HMEQ_credit_data(outlier_factor=-1, data_url='https://raw.githubusercont
         - Encoding of categorical features
 
         Args:
+            data_url (str): The URL of the data source. The default URL points 
+            to the raw data file on GitHub.scale_features
+                        
             outlier_factor (float): The factor used to determine the range of 
             acceptable values for numerical features by Tuckey's rule, which
             defines an upper/lower outlier to be a value outlier_factor*IQR 
             below/above the first/third quartile. The default value is -1 meaning
             that no truncation is performed.
 
-            data_url (str): The URL of the data source. The default URL points 
-            to the raw data file on GitHub.
+            scale_features (bool): A binary variable indicating whether all 
+            numerical features should be scaled using a z-transformation
 
         Returns:
             X: A pandas DataFrame containing the feature matrix of the prepared data.
@@ -51,6 +56,7 @@ def get_HMEQ_credit_data(outlier_factor=-1, data_url='https://raw.githubusercont
     import numpy as np
     import pandas as pd
     from sklearn.impute import SimpleImputer
+    from sklearn.preprocessing import StandardScaler
     
     ####################################################################
     # Load data 
@@ -107,6 +113,12 @@ def get_HMEQ_credit_data(outlier_factor=-1, data_url='https://raw.githubusercont
             lower_bound = Q1 - outlier_factor * IQR
             upper_bound = Q3 + outlier_factor * IQR
             df[col] = df[col].clip(lower=lower_bound, upper=upper_bound)
+    #-------------------------------------------------------------------
+    # Scale numerical features using the z-transformation (if requested)
+    #-------------------------------------------------------------------
+    if scale_features == True:
+        scaler = StandardScaler()
+        df[ix_num] = scaler.fit_transform(df[ix_num])
     #-------------------------------------------------------------------
     # Dummy encode categorical features
     #-------------------------------------------------------------------
