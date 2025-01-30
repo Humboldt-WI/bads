@@ -74,7 +74,7 @@ def get_HMEQ_credit_data(data_url='https://raw.githubusercontent.com/Humboldt-WI
     # Discretize numerical features DELINQcat and DEROG
     #-------------------------------------------------------------------
     df['DELINQcat'] = pd.cut(df['DELINQ'], bins=[-1, 0, 1, float('inf')], labels=['0', '1', '1+']).astype('category')
-    df['DEROGzero'] = pd.cut(df['DEROG'], bins=[-1, 0, float('inf')], labels=[1, 0]).astype(bool)
+    df['DEROGzero'] = pd.cut(df['DEROG'], bins=[-1, 0, float('inf')], labels=[1, 0])
     df = df.drop(columns=['DELINQ', 'DEROG'])  # Drop the original columns
     #-------------------------------------------------------------------
     # Missing values among categorical features
