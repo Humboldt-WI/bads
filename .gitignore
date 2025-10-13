@@ -6,6 +6,8 @@
 
 # ignore all py-cache files
 **/.pyc
+/tutorial_notebooks/__pycache__/
+
 # ignore solutions to exercises\solutions
 /exercise_notebooks/solutions/
 
