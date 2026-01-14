@@ -3,8 +3,130 @@
 # used in the tutorial notebooks. The functions are designed to simplify routine 
 # tasks like loading and preparing a given data set to streamline the tutorial notebooks
 ####################################################################################
+from typing import Tuple
+from sklearn.impute import SimpleImputer
+from sklearn.preprocessing import StandardScaler
+import pandas as pd
 
-def get_HMEQ_credit_data(data_url='https://raw.githubusercontent.com/Humboldt-WI/bads/master/data/hmeq.csv', 
+def prepare_hmeq_data(df: pd.DataFrame, missing_dummy=True, outlier_factor: float = 0, scale_features: bool = True, verbose=0) -> Tuple[pd.DataFrame, pd.Series]:
+    """ Prepare the HMEQ data for analysis.
+        Missing values will be imputed using the median (numerical features) or the mode (categorical features).
+        Optionally, a dummy variable can be added for each feature indicating for which cases, in that feature, imputation was carried out. 
+        Other data preparation steps, including outlier truncation (using the IQR method), feature scaling (z-transformation), and dicretization
+        can be configured via arguments.
+
+    Parameters
+    ----------  
+    df : pd.DataFrame
+        Raw HMEQ data as a Pandas DataFrame.
+    missing_dummy : bool, optional
+        Whether to add a dummy variable indicating missingness for DEBTINC. Default is True.
+    outlier_factor : float, optional
+        Factor to determine the extent of outlier truncation using the IQR method. Default is 0 (no truncation). 
+        If set to a positive number, outliers are truncated at Q1 - outlier_factor*IQR and Q3 + outlier_factor*IQR.
+    scale_features : bool, optional
+        Whether to scale numerical features using z-transformation. Default is True.
+    verbose : int, optional
+        Verbosity level for logging. Default is 0 (no logging).
+
+    Returns
+    -------
+    X : pd.DataFrame
+        Prepared feature matrix.
+    y : pd.Series
+        Target variable (BAD).
+    """
+    
+    X = df.copy()  # Create a copy of the original data frame
+    y = X.pop('BAD')  # Separate the target variable
+    ####################################################################
+    # Type conversion
+    #-------------------------------------------------------------------
+    df['BAD'] = df['BAD'].astype('bool')  # The target variable has only two states so that we can store it as a boolean
+    df['REASON'] = df['REASON'].astype('category')  # Code categories properly 
+    df['JOB'] = df['JOB'].astype('category')
+    df['LOAN'] = df['LOAN'].astype('float')  # Ensure all numerical features use data type float (for indexing) 
+
+    cat_features = df.select_dtypes(include=['category']).columns  # Get an index of the categorical columns
+    num_features = df.select_dtypes(include=['float']).columns  # Get an index of the numerical columns
+
+    ####################################################################
+    # Missing value imputation
+    #-------------------------------------------------------------------
+    for col in X.columns:
+        # Check if there are missing values in this column
+        if X[col].isna().any():
+            # If requested, add dummy BEFORE imputation to capture original missingness
+            if missing_dummy==True:
+                dummy_col_name = f"{col}_missing"
+                X[dummy_col_name] = X[col].isna()
+                if verbose>0: print(f"Added missingness dummy for column {col} as {dummy_col_name}")
+
+            # Handle floats: fill with median
+            if col in num_features:
+                median_value = X[col].median()
+                X[col] = X[col].fillna(median_value)
+                if verbose>0: print(f"Filled missing values in numerical column {col} with median value {median_value}")
+
+            # Handle categoricals/objects: fill with mode
+            elif col in cat_features:
+                # mode() returns a Series; take the first mode if it exists
+                modes = X[col].mode(dropna=True)
+                if len(modes) > 0:
+                    mode_value = modes.iloc[0]
+                    X[col] = X[col].fillna(mode_value)
+                    if verbose>0: print(f"Filled missing values in categorical column {col} with mode value {mode_value}")
+                else:
+                    raise Exception(f"No mode found for column {col} during imputation. Leaving this column untouched.")
+                continue
+            else:
+                raise Exception(f"Column")
+
+    # Verify that there are no missing values left
+    check = X.isna().sum().sum()
+    if check > 0:
+        raise Exception(f"We still observe {check} missing values in the data.")
+    ####################################################################
+    # Feature engineering: 
+    # Domain knowledge suggests that the features DELINQcat and DEROG are important predictors of loan default.
+    # However, their distribution is highly skewed, with many zeros and few high values. 
+    # To aid modeling, we add a dummy feature distinguishing cases where these features are zero versus non-zero 
+    #-------------------------------------------------------------------
+    X['DELINQ_nz'] = pd.cut(X['DELINQ'], bins=[-1, 0, float('inf')], labels=[0, 1])
+    X['DEROG_nz'] = pd.cut(X['DEROG'], bins=[-1, 0, float('inf')], labels=[0, 1])
+
+    ####################################################################
+    # Truncate outliers among numerical features
+    #-------------------------------------------------------------------
+    if outlier_factor > 0:
+        for col in num_features:
+            q1, q3 = X[col].quantile(0.25), X[col].quantile(0.75)
+            min_x, max_x = X[col].min(), X[col].max()
+            iqr = q3 - q1
+            lower_bound = np.max([q1 - outlier_factor * iqr, min_x])
+            upper_bound = np.min([q3 + outlier_factor * iqr, max_x])
+            X[col] = X[col].clip(lower=lower_bound, upper=upper_bound)
+            if lower_bound > min_x or upper_bound < max_x:
+                if verbose>0: print(f"Truncated outliers in column {col} to range [{lower_bound}, {upper_bound}]")
+
+    #-------------------------------------------------------------------
+    # Scale numerical features using the z-transformation (if requested)
+    #-------------------------------------------------------------------
+    if scale_features == True:
+        scaler = StandardScaler()
+        X[num_features] = scaler.fit_transform(X[num_features])
+    #-------------------------------------------------------------------
+    # Dummy encode categorical features
+    #-------------------------------------------------------------------
+    dummy_codes = pd.get_dummies(X[cat_features], drop_first=True)  # obtain dummy codes
+    X.drop(cat_features, axis=1, inplace=True)    # remove original categorical features
+    X = pd.concat([X, dummy_codes], axis=1)  # add dummy codes back to feature matrix     
+    return X, y
+
+
+
+
+def get_HMEQ_credit_data_old(data_url='https://raw.githubusercontent.com/Humboldt-WI/bads/master/data/hmeq.csv', 
                          outlier_factor=0,
                          scale_features=False):
     '''
