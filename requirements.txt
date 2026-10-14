@@ -1,5 +1,5 @@
 # Python Requirements for BADS
-# Target Python: 3.11
+# Target Python: 3.10
 
 # Core Scientific Computing
 numpy>=1.23.0,<2.0.0
